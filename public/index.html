@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mini Vercel TS</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 480px; margin: 3rem auto; padding: 0 1rem; }
+    input, button { font-size: 1rem; padding: .5rem; }
+    pre { background: #f4f4f4; padding: 1rem; border-radius: 6px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Mini proyecto Vercel + TS</h1>
+  <input id="name" placeholder="Tu nombre">
+  <button id="btn">Llamar a /api/hello</button>
+  <pre id="out">…</pre>
+  <script>
+    document.getElementById("btn").onclick = async () => {
+      const name = encodeURIComponent(document.getElementById("name").value || "mundo");
+      const res = await fetch(`/api/hello?name=${name}`);
+      document.getElementById("out").textContent = JSON.stringify(await res.json(), null, 2);
+    };
+  </script>
+</body>
+</html>
