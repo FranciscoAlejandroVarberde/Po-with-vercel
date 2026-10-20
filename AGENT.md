@@ -70,7 +70,10 @@ MEMORY.md           bitácora de decisiones y estado
 8. **Deploys siguientes**: cada `git push` a `main` genera un deploy de **producción**. Las otras ramas y los PRs generan deploys de **preview** con su propia URL.
 
 ## Problemas comunes
-- **404 en `/api/hello`**: la carpeta tiene que llamarse `api/` y estar en la **raíz** del repo. Revisá también que el Root Directory en Vercel sea la raíz.
+- **El botón "no hace nada" o muestra `Error: 404`**: la página carga pero la API no existe en el deploy. Probá directo `https://<proyecto>.vercel.app/api/hello`.
+  - La carpeta tiene que llamarse `api/` y estar en la **raíz** del repo.
+  - En Vercel → Settings → Build and Deployment, **Root Directory tiene que quedar vacío (raíz)**, nunca `public`. Si apunta a `public`, Vercel solo ve el HTML y no la carpeta `api/`.
+  - Después de cambiar la configuración: Deployments → ⋯ → **Redeploy**.
 - **La página muestra 404 en `/`**: revisá que `public/index.html` exista y que Output Directory no apunte a otra carpeta.
 - **Error de tipos en el build**: corré `npm run typecheck` en local y corregí.
 - **Variables de entorno**: se cargan en Vercel → Project → Settings → Environment Variables y se leen con `process.env.NOMBRE`. Si las usás, agregá `@types/node`.
