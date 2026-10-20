@@ -6,7 +6,9 @@ Guía para cualquier agente o dev que trabaje en este proyecto.
 El proyecto web más chico posible con **front estático + back en TypeScript**, preparado para publicarse en **Vercel**.
 - Front: `public/index.html` (HTML + JS inline, sin dependencias).
 - Back: `api/hello.ts` y `api/n8n.ts` (funciones serverless de Vercel).
-- Uso docente: los alumnos lo usan para practicar n8n **local** (en su PC) conectado a Vercel. La guía está en `GUIA-ALUMNOS.md`.
+- Uso docente, con dos guías para alumnos en este orden:
+  1. `GUIA-VERCEL-GITHUB.md`: crear este proyecto desde cero y publicarlo con GitHub + Vercel.
+  2. `GUIA-ALUMNOS.md`: n8n **local** (en su PC) conectado a Vercel.
 
 ## Estructura
 ```
@@ -14,7 +16,8 @@ public/index.html   front: botón a /api/hello + formulario que envía a /api/n8
 api/hello.ts        back: GET /api/hello?name=X → { message, time }
 api/n8n.ts          back: POST /api/n8n → reenvía el JSON al webhook de n8n (N8N_WEBHOOK_URL)
 package.json        sin dependencias de runtime; devDeps: typescript, @types/node
-GUIA-ALUMNOS.md     guía paso a paso para alumnos: n8n local + Vercel (2 ejercicios)
+GUIA-VERCEL-GITHUB.md  guía 1 para alumnos: primer proyecto → GitHub → Vercel
+GUIA-ALUMNOS.md        guía 2 para alumnos: n8n local + Vercel (2 ejercicios)
 tsconfig.json       solo chequeo de tipos (noEmit). Vercel compila el TS solo.
 .gitignore          node_modules/, .vercel/
 AGENT.md            este archivo
