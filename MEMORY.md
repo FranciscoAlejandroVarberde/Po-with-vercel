@@ -13,6 +13,14 @@ Bitácora del proyecto: decisiones, contexto y estado. Se actualiza en cada camb
 - **2026-10-19: `tsconfig` con `noEmit`.** Vercel compila el TS por su cuenta y `tsc` solo valida.
 - **2026-10-19: deploy por GitHub → Vercel**, con deploy automático en cada push a `main`.
 - **2026-10-19: el front muestra los errores de la API.** Antes, si `/api/hello` fallaba, el botón no hacía nada visible.
+- **2026-10-19: uso docente con n8n.** El proyecto es de prueba. El objetivo es darles a los alumnos herramientas **gratuitas** para usar n8n.
+  - n8n **no** corre dentro de Vercel: es un servidor permanente y Vercel es serverless.
+  - Opción elegida: **n8n local en la PC de cada alumno** (`npx n8n`, o Docker). Es gratis y sin límites. Se descartaron para la guía: n8n Cloud (es una prueba de 14 días, no un plan gratis) y Oracle Cloud o los planes gratis de GCP/AWS (piden tarjeta y son complejos).
+  - n8n → Vercel funciona directo. Vercel → n8n necesita un túnel: se eligió **Cloudflare Tunnel** (`cloudflared tunnel --url http://localhost:5678`) porque es gratis y no requiere cuenta.
+  - Cada alumno hace **fork** del repo y su propio deploy en Vercel, con su propia `N8N_WEBHOOK_URL`.
+- **2026-10-19: `api/n8n.ts`** reenvía el JSON a `N8N_WEBHOOK_URL`, con un `x-secret` opcional. Se agregó `@types/node` y `"types": ["node"]` en tsconfig, porque TypeScript 7 no los toma solo.
+  - Se probó en local con un webhook falso: los casos sin env (500), ok (200), JSON inválido (400), secreto incorrecto (502 con 403 de n8n) y n8n apagado (502) responden lo esperado.
+  - **No se probó con un n8n real ni en Vercel.**
 
 ## Incidentes
 - **2026-10-19: el botón "no hace nada" en producción.** La página carga, pero `/api/hello` devuelve **404 NOT_FOUND**. En el repo de GitHub `api/hello.ts` sí está en la raíz, así que el problema es la configuración del proyecto en Vercel. Lo más probable es que el **Root Directory** esté en `public` (el nombre del proyecto, `po-with-vercel-public`, lo sugiere). Si es así, Vercel no ve la carpeta `api/`.
@@ -30,6 +38,10 @@ Bitácora del proyecto: decisiones, contexto y estado. Se actualiza en cada camb
 - [x] Importar en Vercel y hacer el primer deploy (el estático anda, la API daba 404).
 - [x] Corregir el Root Directory en Vercel, redeployar y confirmar que `/api/hello` responde 200.
 - [x] **Proyecto publicado y funcionando de punta a punta (front + back).**
+- [x] `api/n8n.ts`, el formulario en el front y `GUIA-ALUMNOS.md` creados. Typecheck OK.
+- [ ] Push y verificar `/api/n8n` en producción. Sin `N8N_WEBHOOK_URL` tiene que responder 500 con el mensaje "Falta configurar...".
+- [ ] El repo de GitHub tiene que ser **público** para que los alumnos puedan hacer fork.
+- [ ] Probar la guía de punta a punta con un n8n real antes de dársela a los alumnos.
 
 ## Datos del deploy
 - Repo GitHub: https://github.com/FranciscoAlejandroVarberde/Po-with-vercel

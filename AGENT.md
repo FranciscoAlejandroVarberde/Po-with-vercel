@@ -5,13 +5,16 @@ Guía para cualquier agente o dev que trabaje en este proyecto.
 ## Qué es
 El proyecto web más chico posible con **front estático + back en TypeScript**, preparado para publicarse en **Vercel**.
 - Front: `public/index.html` (HTML + JS inline, sin dependencias).
-- Back: `api/hello.ts` (función serverless de Vercel).
+- Back: `api/hello.ts` y `api/n8n.ts` (funciones serverless de Vercel).
+- Uso docente: los alumnos lo usan para practicar n8n **local** (en su PC) conectado a Vercel. La guía está en `GUIA-ALUMNOS.md`.
 
 ## Estructura
 ```
-public/index.html   front: hace fetch a /api/hello y muestra el JSON
+public/index.html   front: botón a /api/hello + formulario que envía a /api/n8n
 api/hello.ts        back: GET /api/hello?name=X → { message, time }
-package.json        sin dependencias de runtime; devDep: typescript
+api/n8n.ts          back: POST /api/n8n → reenvía el JSON al webhook de n8n (N8N_WEBHOOK_URL)
+package.json        sin dependencias de runtime; devDeps: typescript, @types/node
+GUIA-ALUMNOS.md     guía paso a paso para alumnos: n8n local + Vercel (2 ejercicios)
 tsconfig.json       solo chequeo de tipos (noEmit). Vercel compila el TS solo.
 .gitignore          node_modules/, .vercel/
 AGENT.md            este archivo
@@ -23,6 +26,23 @@ MEMORY.md           bitácora de decisiones y estado
 - Vercel compila el `.ts` automáticamente, así que no hay paso de build.
 - La carpeta `public/` se sirve como estático, y `public/index.html` queda en `/`.
 - Los handlers usan la **firma Web estándar** (`Request` → `Response`), sin `@vercel/node`. Se exporta una función por método HTTP: `GET`, `POST`, etc.
+
+## Variables de entorno (Vercel → Settings → Environment Variables)
+| Variable | Obligatoria | Uso |
+|---|---|---|
+| `N8N_WEBHOOK_URL` | Para `/api/n8n` | URL pública del webhook de n8n (túnel Cloudflare + `/webhook/<path>`) |
+| `N8N_SECRET` | No | Si existe, se manda en el header `x-secret` (en n8n: Webhook → Header Auth) |
+
+- Después de cambiar una variable hay que hacer **Redeploy**.
+- Nunca se commitean URLs ni secretos.
+
+## Respuestas de `/api/n8n`
+| Status | Significado |
+|---|---|
+| 200 | n8n respondió OK → `{ ok, status, n8n }` |
+| 400 | El body no es un JSON válido |
+| 500 | Falta `N8N_WEBHOOK_URL` |
+| 502 | n8n respondió con error (`n8n` trae su respuesta) o no se pudo contactar (n8n o túnel apagados) |
 
 ## Comandos
 | Comando | Qué hace |
@@ -76,4 +96,5 @@ MEMORY.md           bitácora de decisiones y estado
   - Después de cambiar la configuración: Deployments → ⋯ → **Redeploy**.
 - **La página muestra 404 en `/`**: revisá que `public/index.html` exista y que Output Directory no apunte a otra carpeta.
 - **Error de tipos en el build**: corré `npm run typecheck` en local y corregí.
-- **Variables de entorno**: se cargan en Vercel → Project → Settings → Environment Variables y se leen con `process.env.NOMBRE`. Si las usás, agregá `@types/node`.
+- **Variables de entorno**: se cargan en Vercel → Project → Settings → Environment Variables y se leen con `process.env.NOMBRE`. Los tipos vienen de `@types/node`, que ya está instalado. Con TypeScript 7 hace falta `"types": ["node"]` en `tsconfig.json`, que ya está configurado.
+- **Problemas con n8n**: ver la tabla de la sección 6 en `GUIA-ALUMNOS.md`.
